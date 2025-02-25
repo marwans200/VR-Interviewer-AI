@@ -5,6 +5,7 @@ using System.IO;
 
 public class UdpSender : MonoBehaviour
 {
+    public Camera cam;
     public string receiverIP = "192.168.1.100"; // Replace with receiver's actual IP
     public int port = 5000; // Must match receiver's port
     private UdpClient udpClient;
@@ -28,12 +29,12 @@ public class UdpSender : MonoBehaviour
         Debug.Log("[Sender] Capturing frame...");
 
         // Capture frame from camera
-        Camera.main.targetTexture = renderTexture;
-        Camera.main.Render();
+        cam.targetTexture = renderTexture;
+        cam.Render();
         RenderTexture.active = renderTexture;
         tex2D.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
         tex2D.Apply();
-        Camera.main.targetTexture = null;
+        cam.targetTexture = null;
         RenderTexture.active = null;
 
         // Convert to JPG
