@@ -1,10 +1,19 @@
 # ninja log v5
 102	11432	7621715010695537	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	74db52c7d05cbf4b
+11589	17599	7621715074240543	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	f00517e2ac51c852
 26	11588	7621715012522627	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	6f70c1b73baa549a
 236	12698	7621715024107514	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	92b1ad83b37cb43a
+11456	17063	7621715069331932	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	77c435e67ef47498
 1	13106	7621715028537068	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	9b0604a4bcdb30fa
 246	14659	7621715040245198	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	1ebca88a033dcf94
 16	15548	7621715052498955	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	be95ebfae7d64887
-11456	17063	7621715069331932	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	77c435e67ef47498
-11589	17599	7621715074240543	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	f00517e2ac51c852
 17599	18176	7621715080244455	C:/Unity Projects/VR Interviewer (AI)/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/5e4e1l3e/obj/arm64-v8a/libgame.so	89899c34157e6760
+83	5473	7621885463383490	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	74db52c7d05cbf4b
+29	5655	7621885465368198	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	6f70c1b73baa549a
+51	5935	7621885468344585	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	92b1ad83b37cb43a
+38	6565	7621885474184009	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	9b0604a4bcdb30fa
+71	7193	7621885481020787	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	1ebca88a033dcf94
+14	7727	7621885486593266	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	be95ebfae7d64887
+5475	8774	7621885497163802	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	77c435e67ef47498
+5656	9039	7621885499859590	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	f00517e2ac51c852
+9040	9753	7621885507016177	C:/Unity Projects/VR Interviewer (AI)/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/5e4e1l3e/obj/arm64-v8a/libgame.so	89899c34157e6760

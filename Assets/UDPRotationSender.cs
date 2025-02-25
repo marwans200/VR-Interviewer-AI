@@ -5,9 +5,11 @@ using System.Text;
 
 public class UdpRotationSender : MonoBehaviour
 {
-    public string receiverIP = "192.168.1.100"; // Change to receiver's IP
+    public string receiverIP = "192.168.1.100"; // Change this to the receiver's IP
     public int port = 5001;
     private UdpClient udpClient;
+    private Quaternion calibrationOffset = Quaternion.identity;
+    private bool isCalibrated = false;
 
     void Start()
     {
@@ -19,31 +21,31 @@ public class UdpRotationSender : MonoBehaviour
 
     void SendRotation()
     {
-        Quaternion rotation = Input.gyro.attitude;
+        Quaternion rawRotation = Input.gyro.attitude;
 
         // Adjust for Unity's coordinate system
-        rotation = new Quaternion(rotation.x, rotation.y, -rotation.z, -rotation.w);
+        rawRotation = new Quaternion(rawRotation.x, rawRotation.y, -rawRotation.z, -rawRotation.w);
 
-        // Correct rotation based on screen orientation
-        switch (Screen.orientation)
+        rawRotation = Quaternion.Euler(0, 0, -90) * rawRotation;
+
+        // Apply calibration offset
+        if (isCalibrated)
         {
-            case ScreenOrientation.LandscapeLeft:
-                rotation = Quaternion.Euler(0, 0, -90) * rotation;
-                break;
-            case ScreenOrientation.LandscapeRight:
-                rotation = Quaternion.Euler(0, 0, 90) * rotation;
-                break;
-            case ScreenOrientation.PortraitUpsideDown:
-                rotation = Quaternion.Euler(0, 0, 180) * rotation;
-                break;
-            default: // Portrait (default)
-                break;
+            rawRotation = Quaternion.Inverse(calibrationOffset) * rawRotation;
         }
 
-        string message = $"{rotation.x},{rotation.y},{rotation.z},{rotation.w}";
+        string message = $"{rawRotation.x},{rawRotation.y},{rawRotation.z},{rawRotation.w}";
         byte[] data = Encoding.UTF8.GetBytes(message);
         udpClient.Send(data, data.Length, receiverIP, port);
         Debug.Log($"[Sender] Sent rotation: {message}");
+    }
+
+    public void Calibrate()
+    {
+        calibrationOffset = Input.gyro.attitude;
+        calibrationOffset = new Quaternion(calibrationOffset.x, calibrationOffset.y, -calibrationOffset.z, -calibrationOffset.w);
+        isCalibrated = true;
+        Debug.Log("[Sender] Calibration set!");
     }
 
     void OnApplicationQuit()
