@@ -12,6 +12,7 @@ public class UdpRotationReceiver : MonoBehaviour
     private Quaternion receivedRotation = Quaternion.identity;
     private bool dataReceived = false;
     public Transform RotApplyTransform;
+    public Vector3 OffsetRot;
 
     void Start()
     {
@@ -55,6 +56,7 @@ public class UdpRotationReceiver : MonoBehaviour
     {
         if (dataReceived)
         {
+            receivedRotation *= Quaternion.Euler(OffsetRot);
             RotApplyTransform.rotation = receivedRotation; // Apply rotation
             dataReceived = false;
         }

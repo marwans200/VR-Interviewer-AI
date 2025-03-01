@@ -1,67 +1,56 @@
 using UnityEngine;
-using System.Net.Sockets;
 using System.Net;
+using System.Net.Sockets;
+using System.Text;
 using System.IO;
+using System;
 
 public class UdpSender : MonoBehaviour
 {
-    public Camera cam;
-    public string receiverIP = "192.168.1.100"; // Replace with receiver's actual IP
-    public int port = 5000; // Must match receiver's port
+    public string receiverIP = "192.168.1.100"; // Set receiver's IP
+    public int port = 5002; // UDP port
+    public int width = 1280; // Adjust resolution (1920x1080 for Full HD)
+    public int height = 720;
+    public bool useJpeg = true; // Toggle between PNG and JPEG
+
     private UdpClient udpClient;
     private RenderTexture renderTexture;
-    private Texture2D tex2D;
+    private Texture2D tex;
 
     void Start()
     {
-        Debug.Log("[Sender] Initializing UDP Sender...");
-
         udpClient = new UdpClient();
-        renderTexture = new RenderTexture(Screen.width, Screen.height, 16);
-        tex2D = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
-
-        Debug.Log($"[Sender] Target Receiver: {receiverIP}:{port}");
-        InvokeRepeating(nameof(CaptureAndSend), 1f, 0.05f); // 20 FPS (Adjustable)
+        renderTexture = new RenderTexture(width, height, 16);
+        tex = new Texture2D(width, height, TextureFormat.RGB24, false);
+        Camera.main.targetTexture = renderTexture;
+        InvokeRepeating(nameof(SendImage), 0, 0.1f); // Send every 100ms (~10 FPS)
     }
 
-    void CaptureAndSend()
+    void SendImage()
     {
-        Debug.Log("[Sender] Capturing frame...");
-
-        // Capture frame from camera
-        cam.targetTexture = renderTexture;
-        cam.Render();
         RenderTexture.active = renderTexture;
-        tex2D.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
-        tex2D.Apply();
-        cam.targetTexture = null;
+        tex.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+        tex.Apply();
         RenderTexture.active = null;
 
-        // Convert to JPG
-        byte[] imageBytes = tex2D.EncodeToJPG(50); // Compression to reduce size
-        Debug.Log($"[Sender] Captured frame size: {imageBytes.Length / 1024} KB");
+        byte[] imageBytes;
+        if (useJpeg)
+            imageBytes = tex.EncodeToJPG(90); // JPEG compression (90% quality)
+        else
+            imageBytes = tex.EncodeToPNG(); // PNG (larger but lossless)
 
-        // Send via UDP
-        SendData(imageBytes);
-    }
+        byte[] lengthPrefix = BitConverter.GetBytes(imageBytes.Length);
+        byte[] sendData = new byte[lengthPrefix.Length + imageBytes.Length];
+        lengthPrefix.CopyTo(sendData, 0);
+        imageBytes.CopyTo(sendData, lengthPrefix.Length);
 
-    void SendData(byte[] data)
-    {
-        try
-        {
-            Debug.Log($"[Sender] Sending {data.Length} bytes to {receiverIP}:{port}...");
-            udpClient.Send(data, data.Length, receiverIP, port);
-            Debug.Log("[Sender] Data sent successfully.");
-        }
-        catch (SocketException ex)
-        {
-            Debug.LogError("[Sender] UDP Send Error: " + ex.Message);
-        }
+        udpClient.Send(sendData, sendData.Length, receiverIP, port);
+        Debug.Log($"[Sender] Sent image ({imageBytes.Length} bytes)");
     }
 
     void OnApplicationQuit()
     {
-        Debug.Log("[Sender] Closing UDP connection...");
         udpClient.Close();
+        Camera.main.targetTexture = null;
     }
 }

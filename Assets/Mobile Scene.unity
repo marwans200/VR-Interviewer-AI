@@ -606,7 +606,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   port: 5000
   displayImage: {fileID: 662630373}
-  displayImageR: {fileID: 1316481551}
+  RdisplayImage: {fileID: 1316481551}
 --- !u!114 &1439501456
 MonoBehaviour:
   m_ObjectHideFlags: 0

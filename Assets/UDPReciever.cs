@@ -1,40 +1,27 @@
 using UnityEngine;
+using UnityEngine.UI;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using System.Collections;
-using UnityEngine.UI;
+using System.IO;
+using System;
 
 public class UdpReceiver : MonoBehaviour
 {
-    public int port = 5000; // Match with sender
-    private UdpClient udpClient;
-    private Texture2D receivedTexture;
-    private Thread receiveThread;
+    public int port = 5002;
     public RawImage displayImage;
-    public RawImage displayImageR;
-    private byte[] receivedData; // Store received data
+    public RawImage RdisplayImage;
+    private UdpClient udpClient;
+    private Thread receiveThread;
+    private bool dataReceived = false;
+    private byte[] receivedData;
 
     void Start()
     {
-        Debug.Log("[Receiver] Initializing UDP Receiver...");
-
-        receivedTexture = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
-
-        if (displayImage == null)
-        {
-            Debug.LogError("[Receiver] RawImage not found! Make sure it's named 'ReceivedImage'.");
-            return;
-        }
-
         udpClient = new UdpClient(port);
-        Debug.Log($"[Receiver] Listening on port {port}...");
-
         receiveThread = new Thread(ReceiveData) { IsBackground = true };
         receiveThread.Start();
-
-        // Start coroutine to update UI
-        StartCoroutine(UpdateImage());
+        Debug.Log($"[Receiver] Listening on port {port}...");
     }
 
     void ReceiveData()
@@ -44,11 +31,13 @@ public class UdpReceiver : MonoBehaviour
         {
             try
             {
-                Debug.Log("[Receiver] Waiting for data...");
                 byte[] data = udpClient.Receive(ref endPoint);
-                Debug.Log($"[Receiver] Received {data.Length} bytes from {endPoint.Address}");
+                Debug.Log($"[Receiver] Received {data.Length} bytes");
 
-                receivedData = data; // Store the latest data
+                int length = BitConverter.ToInt32(data, 0);
+                receivedData = new byte[length];
+                System.Array.Copy(data, 4, receivedData, 0, length);
+                dataReceived = true;
             }
             catch (SocketException ex)
             {
@@ -57,24 +46,20 @@ public class UdpReceiver : MonoBehaviour
         }
     }
 
-    IEnumerator UpdateImage()
+    void Update()
     {
-        while (true)
+        if (dataReceived)
         {
-            if (receivedData != null && receivedData.Length > 0)
-            {
-                receivedTexture.LoadImage(receivedData);
-                displayImage.texture = displayImageR.texture = receivedTexture;
-                Debug.Log("[Receiver] Image updated on UI.");
-                receivedData = null; // Clear the buffer
-            }
-            yield return new WaitForSeconds(0.05f); // 20 FPS update
+            Texture2D tex = new Texture2D(2, 2);
+            tex.LoadImage(receivedData);
+            displayImage.texture = tex;
+            RdisplayImage.texture = tex;
+            dataReceived = false;
         }
     }
 
     void OnApplicationQuit()
     {
-        Debug.Log("[Receiver] Closing UDP connection...");
         receiveThread.Abort();
         udpClient.Close();
     }
